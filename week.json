@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-27T12:27",
+ "updated": "2026-11-27T14:45",
  "days": [
   {
    "date": "2026-11-28",
@@ -61,10 +61,6 @@
      "w": "Shared micro meeting"
     },
     {
-     "t": "12:30",
-     "w": "Lister review"
-    },
-    {
      "t": "14:00",
      "w": "Connor 1:1"
     },
@@ -90,6 +86,11 @@
     {
      "t": "11:00",
      "w": "ZBP1 meeting"
+    },
+    {
+     "t": "19:30",
+     "w": "Evening plans",
+     "k": "home"
     }
    ]
   },
@@ -101,10 +102,6 @@
      "t": "",
      "w": "School forms due",
      "k": "due"
-    },
-    {
-     "t": "10:00",
-     "w": "Lister review"
     },
     {
      "t": "14:00",
@@ -198,7 +195,7 @@
   ],
   "shopping": [],
   "family": [
-   "G's birthday plans"
+   "Tray for sushi (Mon 30)"
   ]
  }
 }
