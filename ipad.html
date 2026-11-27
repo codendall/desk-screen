@@ -65,6 +65,9 @@ ol li:before{content:attr(data-n);position:absolute;left:0;top:7px;width:28px;he
 .done{opacity:.35;text-decoration:line-through}
 ol li.done:before{content:'\2713';background:#3a9a5b}
 .chips span.done{background:#e6f4ea;color:#3a9a5b}
+.lst{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8a8170;margin:2px 0 4px}
+.chips.shop span{background:#e8f5ec;color:#22783f}
+.chips.fam span{background:#fdf0e3;color:#a2561b}
 .tap{-webkit-tap-highlight-color:rgba(224,96,63,.15);cursor:pointer}
 .hint{font-size:11px;color:#b0a597;letter-spacing:0;text-transform:none;font-weight:500}
 #night{position:fixed;left:0;top:0;right:0;bottom:0;background:#000;z-index:99;display:none}
@@ -103,6 +106,7 @@ ol li.done:before{content:'\2713';background:#3a9a5b}
     <div class="col r">
       <div class="card"><h2><span>Do now</span><span class="hint">tap to tick</span></h2><ol id="donow"></ol></div>
       <div class="card" style="margin-bottom:0;-webkit-flex:1;flex:1"><h2><span>Due soon</span></h2><ul class="due" id="due"></ul></div>
+      <div class="card" id="listsc" style="margin:12px 0 0;padding-top:12px;padding-bottom:6px;display:none"><h2><span>Lists</span><span class="hint">from Reminders</span></h2><div id="lists"></div></div>
     </div>
     <div class="col wk">
       <div class="card" style="-webkit-flex:1;flex:1;overflow:hidden;margin-bottom:0"><h2><span>Rest of the week</span><span class="hint">tap to tick</span></h2><div id="week"></div></div>
@@ -127,7 +131,11 @@ function renderWeek(){var el=$('week');if(!week||!week.days){el.innerHTML='<div 
     h+='<div class="wd"><div class="dl">'+esc(d.label)+'</div>';
     for(var j=0;j<items.length;j++){var it=items[j];h+='<div class="it tap '+(it.k||'')+'" data-k="'+esc(key(d.date+' '+it.t+' '+it.w))+'"><span class="tt">'+esc(it.t||'')+'</span><span class="ww">'+esc(it.w)+'</span></div>'}
     h+='</div>'}
-  el.innerHTML=h||'<div class="empty">Nothing coming up</div>';bindTicks()}
+  el.innerHTML=h||'<div class="empty">Nothing coming up</div>';renderLists();bindTicks()}
+function renderLists(){var L=week&&week.lists,h='',G=[['shopping','Shopping','shop'],['family','Family','fam']];
+  if(L){for(var i=0;i<G.length;i++){var a=L[G[i][0]]||[];if(!a.length)continue;h+='<div class="lst">'+G[i][1]+'</div><div class="chips '+G[i][2]+'">';
+    for(var j=0;j<a.length;j++)h+='<span class="tap" data-k="'+esc(key('list '+G[i][0]+' '+a[j]))+'">'+esc(a[j])+'</span>';h+='</div>'}}
+  $('lists').innerHTML=h;$('listsc').style.display=h?'block':'none'}
 function parse(html){
   var d=new DOMParser().parseFromString(html,'text/html');
   var o={date:txt(d.querySelector('h1')),events:[],tom:'',donow:[],reply:[],rn:'',due:[]};

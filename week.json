@@ -186,5 +186,11 @@
     }
    ]
   }
- ]
+ ],
+ "lists": {
+  "shopping": [],
+  "family": [
+   "G's birthday plans"
+  ]
+ }
 }
