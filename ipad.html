@@ -204,10 +204,11 @@ function send(text){try{var i=new Image();i.src=FORM+'?entry.113233410='+encodeU
 var undoT=null,undoFn=null;
 function showUndo(txt0,fn){$('undot').textContent='Ticked: '+txt0.slice(0,40);undoFn=fn;$('undo').style.display='block';clearTimeout(undoT);undoT=setTimeout(function(){$('undo').style.display='none';undoFn=null},6000)}
 function bindTicks(){var els=document.querySelectorAll('[data-k]');for(var i=0;i<els.length;i++){(function(el){var k=el.getAttribute('data-k');
+  if(!TICK[k]&&SDONE[label(el).replace(/^\d{4}-\d\d-\d\d · /,'')])TICK[k]={t:Date.now(),s:1};
   if(TICK[k]){if(typeof TICK[k]!=='object'){TICK[k]={t:TICK[k],s:1};send('DONE · '+label(el));saveT()}el.className+=' gone'}
   el.onclick=function(ev){var l=label(el);TICK[k]={t:Date.now(),s:1};saveT();send('DONE · '+l);addPts(5,'ticked',(ev&&ev.clientX)||500,(ev&&ev.clientY)||300);el.className+=' done';
     setTimeout(function(){if(TICK[k])el.className+=' gone'},700);
-    showUndo((el.innerText||'').replace(/\s+/g,' ').trim(),function(){delete TICK[k];saveT();send('UNDO · '+l);PTS=Math.max(0,PTS-5);savePts();drawPts();el.className=el.className.replace(/\s*(done|gone)/g,'')})}})(els[i])}}
+    showUndo((el.innerText||'').replace(/\s+/g,' ').trim(),function(){delete TICK[k];saveT();send('UNDO · '+l);addPts(-5,'undo tick',0,0,1);el.className=el.className.replace(/\s*(done|gone)/g,'')})}})(els[i])}}
 function render(){
   var now=new Date();
   if(!data){$('date').textContent='';return}
@@ -249,9 +250,9 @@ var GOAL=300,PTS=0;try{PTS=parseInt(localStorage.getItem('deskPts')||'0',10)||0}
 function savePts(){try{localStorage.setItem('deskPts',String(PTS))}catch(e){}}
 function drawPts(){$('pnum').innerHTML=PTS+'<small>pts</small>';var r=Math.min(100,Math.round(PTS%GOAL/GOAL*100));if(PTS>=GOAL)r=100;$('pbar').style.width=r+'%';
   $('pgoal').innerHTML=PTS>=GOAL?'Treat unlocked! <b id="spend">Spend '+GOAL+'</b>':(GOAL-PTS)+' to your next treat';
-  var sp=document.getElementById('spend');if(sp)sp.onclick=function(){if(confirmSpend()){PTS-=GOAL;savePts();send('SPEND · -'+GOAL+' · treat');drawPts()}}}
-function confirmSpend(){var b=$('pgoal');if(b.getAttribute('data-c')){b.removeAttribute('data-c');return true}b.setAttribute('data-c','1');b.innerHTML='Tap again to spend <b id="spend">'+GOAL+' pts</b>';var sp=document.getElementById('spend');sp.onclick=function(){if(confirmSpend()){PTS-=GOAL;savePts();send('SPEND · -'+GOAL+' · treat');drawPts()}};setTimeout(function(){b.removeAttribute('data-c');drawPts()},4000);return false}
-function addPts(n,why,x,y){PTS+=n;savePts();send('POINTS · +'+n+' · '+why);drawPts();var p=$('pop');p.textContent='+'+n;p.style.left=(x-20)+'px';p.style.top=(y-30)+'px';p.className='';void p.offsetWidth;p.className='go'}
+  var sp=document.getElementById('spend');if(sp)sp.onclick=function(){if(confirmSpend()){PTS-=GOAL;logP(-GOAL);savePts();send('SPEND · -'+GOAL+' · treat');drawPts()}}}
+function confirmSpend(){var b=$('pgoal');if(b.getAttribute('data-c')){b.removeAttribute('data-c');return true}b.setAttribute('data-c','1');b.innerHTML='Tap again to spend <b id="spend">'+GOAL+' pts</b>';var sp=document.getElementById('spend');sp.onclick=function(){if(confirmSpend()){PTS-=GOAL;logP(-GOAL);savePts();send('SPEND · -'+GOAL+' · treat');drawPts()}};setTimeout(function(){b.removeAttribute('data-c');drawPts()},4000);return false}
+function addPts(n,why,x,y,quiet){PTS+=n;logP(n);savePts();send('POINTS · '+(n>0?'+':'')+n+' · '+why);drawPts();if(quiet)return;var p=$('pop');p.textContent='+'+n;p.style.left=(x-20)+'px';p.style.top=(y-30)+'px';p.className='';void p.offsetWidth;p.className='go'}
 $('bigred').addEventListener('click',function(e){var b=$('bigred');b.className='hit';setTimeout(function(){b.className=''},150);addPts(10,'boring thing done',e.clientX||500,e.clientY||100)});
 drawPts();
 $('undob').addEventListener('click',function(){if(undoFn)undoFn();$('undo').style.display='none';undoFn=null});
@@ -293,5 +294,23 @@ $('fdone').onclick=function(ev){if(!F)return;var mins0=Math.max(1,Math.round((F.
   $('fmsg').textContent='Banked: '+mins0+' min on '+F.task+'. +'+fp+' pts';F=null;fSave();clearInterval(fTick);setTimeout(function(){$('focus').style.display='none'},2500)};
 var fl=$('focus').querySelectorAll('.flen span');for(var fi=0;fi<fl.length;fi++)fl[fi].onclick=function(){fLen=+this.getAttribute('data-m');for(var j=0;j<fl.length;j++)fl[j].className=fl[j]==this?'on':''};
 if(F&&F.end)setTimeout(fOpen,1500);
+
+// ---- Shared tally: every iPad logs to the Desk ticks sheet; read it back so all iPads show one total and the same ticks ----
+var CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vSSxT3Zd8zicmhK9KwMRVsQrsVF3BIUKYV67rePqb6Vln4c5L_FvNo6GlFhYc6FZI1rMMr2wsfKrlAP/pub?output=csv';
+var SDONE={},PL=[];try{PL=JSON.parse(localStorage.getItem('deskPL')||'[]')}catch(e){PL=[]}
+function logP(n){PL.push({t:Date.now(),n:n});var cut=Date.now()-86400000;PL=PL.filter(function(p){return p.t>cut});try{localStorage.setItem('deskPL',JSON.stringify(PL))}catch(e){}}
+function csvRows(t){var rows=[],row=[],f='',q=false;for(var i=0;i<t.length;i++){var c=t[i];
+  if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=c}
+  else if(c=='"')q=true;else if(c==','){row.push(f);f=''}else if(c=='\n'||c=='\r'){if(c=='\r'&&t[i+1]=='\n')i++;row.push(f);rows.push(row);row=[];f=''}else f+=c}
+  if(f||row.length){row.push(f);rows.push(row)}return rows}
+function sheetTime(s){var m=/(\d+)\/(\d+)\/(\d{4}) (\d+):(\d+):(\d+)/.exec(s||'');return m?new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5],+m[6]).getTime():0}
+function syncSheet(){try{var x=new XMLHttpRequest();x.open('GET',CSV+'&t='+Date.now(),true);
+  x.onload=function(){if(x.status!=200)return;var r=csvRows(x.responseText),S=0,last=0,st={},week0=Date.now()-7*86400000;
+    for(var i=1;i<r.length;i++){var ts=sheetTime(r[i][0]),it=(r[i][1]||'').trim();if(!ts)continue;if(ts>last)last=ts;
+      var m=/^(POINTS|SPEND) · ([+-]?\d+)/.exec(it);if(m){S+=parseInt(m[2],10);continue}
+      if(ts<week0)continue;m=/^(DONE|UNDO) · \d{4}-\d\d-\d\d · (.*)$/.exec(it);if(m)st[m[2].trim()]=m[1]=='DONE'}
+    var pend=0;for(i=0;i<PL.length;i++)if(PL[i].t>last+1000)pend+=PL[i].n;
+    PTS=Math.max(0,S+pend);savePts();drawPts();SDONE=st;bindTicks()};x.send()}catch(e){}}
+syncSheet();setInterval(syncSheet,5*60*1000);
 </script>
 </body></html>
