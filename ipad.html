@@ -245,7 +245,7 @@ function nightCheck(){var n=new Date(),m=n.getHours()*60+n.getMinutes();var nigh
 $('night').addEventListener('click',function(){peekUntil=Date.now()+60000;nightCheck()});
 setInterval(nightCheck,15000);nightCheck();
 // Points: big red button +10, each tick +5. Saved on the iPad and logged to the Desk ticks sheet.
-var GOAL=100,PTS=0;try{PTS=parseInt(localStorage.getItem('deskPts')||'0',10)||0}catch(e){}
+var GOAL=300,PTS=0;try{PTS=parseInt(localStorage.getItem('deskPts')||'0',10)||0}catch(e){}
 function savePts(){try{localStorage.setItem('deskPts',String(PTS))}catch(e){}}
 function drawPts(){$('pnum').innerHTML=PTS+'<small>pts</small>';var r=Math.min(100,Math.round(PTS%GOAL/GOAL*100));if(PTS>=GOAL)r=100;$('pbar').style.width=r+'%';
   $('pgoal').innerHTML=PTS>=GOAL?'Treat unlocked! <b id="spend">Spend '+GOAL+'</b>':(GOAL-PTS)+' to your next treat';
@@ -289,8 +289,8 @@ $('focusbtn').onclick=fOpen;$('fgo').onclick=fStart;$('fexit').onclick=fClose;
 $('fpause').onclick=function(){if(!F)return;if(F.paused){F.end=Date.now()+F.paused;F.paused=0}else{F.paused=Math.max(0,F.end-Date.now())}fSave();fDraw()};
 $('fmore').onclick=function(){if(!F)return;if(F.paused)F.paused+=300000;else F.end=Math.max(F.end,Date.now())+300000;F.len+=300000;F.rang=0;$('focus').className='';$('fmsg').textContent='';fSave();fDraw()};
 $('fdone').onclick=function(ev){if(!F)return;var mins0=Math.max(1,Math.round((F.len-(F.paused||Math.max(0,F.end-Date.now())))/60000));
-  send('FOCUS · '+mins0+' min · '+F.task);addPts(15,'focus '+mins0+' min',(ev&&ev.clientX)||500,(ev&&ev.clientY)||300);
-  $('fmsg').textContent='Banked: '+mins0+' min on '+F.task+'. +15 pts';F=null;fSave();clearInterval(fTick);setTimeout(function(){$('focus').style.display='none'},2500)};
+  var fp=Math.max(5,Math.round(mins0*0.65));send('FOCUS · '+mins0+' min · '+F.task);addPts(fp,'focus '+mins0+' min',(ev&&ev.clientX)||500,(ev&&ev.clientY)||300);
+  $('fmsg').textContent='Banked: '+mins0+' min on '+F.task+'. +'+fp+' pts';F=null;fSave();clearInterval(fTick);setTimeout(function(){$('focus').style.display='none'},2500)};
 var fl=$('focus').querySelectorAll('.flen span');for(var fi=0;fi<fl.length;fi++)fl[fi].onclick=function(){fLen=+this.getAttribute('data-m');for(var j=0;j<fl.length;j++)fl[j].className=fl[j]==this?'on':''};
 if(F&&F.end)setTimeout(fOpen,1500);
 </script>
