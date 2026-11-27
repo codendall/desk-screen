@@ -67,7 +67,9 @@ ol li.done:before{content:'\2713';background:#3a9a5b}
 .chips span.done{background:#e6f4ea;color:#3a9a5b}
 .tap{-webkit-tap-highlight-color:rgba(224,96,63,.15);cursor:pointer}
 .hint{font-size:11px;color:#b0a597;letter-spacing:0;text-transform:none;font-weight:500}
+#night{position:fixed;left:0;top:0;right:0;bottom:0;background:#000;z-index:99;display:none}
 </style></head><body>
+<div id="night"></div>
 <div id="stage">
   <div class="top">
     <div><div class="clock" id="date"></div><div class="date" id="sub"></div></div>
@@ -167,6 +169,11 @@ function load(){
   var y=new XMLHttpRequest();y.open('GET','week.json?t='+Date.now(),true);y.onload=function(){if(y.status==200){try{week=JSON.parse(y.responseText)}catch(e){}}renderWeek()};y.send();
 }
 window.addEventListener('resize',fit);window.addEventListener('orientationchange',function(){setTimeout(fit,300)});
+// Night mode: black screen 19:30-07:30 (looks off); tap shows the desk for 60 s.
+var NIGHT_FROM=19*60+30,NIGHT_TO=7*60+30,peekUntil=0;
+function nightCheck(){var n=new Date(),m=n.getHours()*60+n.getMinutes();var night=(m>=NIGHT_FROM||m<NIGHT_TO)&&Date.now()>peekUntil;$('night').style.display=night?'block':'none'}
+$('night').addEventListener('click',function(){peekUntil=Date.now()+60000;nightCheck()});
+setInterval(nightCheck,15000);nightCheck();
 fit();load();setInterval(render,30*1000);setInterval(load,10*60*1000);
 // Reload the whole page once a night so any design update arrives.
 setTimeout(function(){location.reload()},(function(){var n=new Date(),t=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1,4,0);return t-n})());
