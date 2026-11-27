@@ -68,8 +68,12 @@ ol li.done:before{content:'\2713';background:#3a9a5b}
 .tap{-webkit-tap-highlight-color:rgba(224,96,63,.15);cursor:pointer}
 .hint{font-size:11px;color:#b0a597;letter-spacing:0;text-transform:none;font-weight:500}
 #night{position:fixed;left:0;top:0;right:0;bottom:0;background:#000;z-index:99;display:none}
+.gone{display:none!important}
+#undo{position:fixed;left:50%;bottom:26px;-webkit-transform:translateX(-50%);transform:translateX(-50%);background:#1f1d1a;color:#fff;border-radius:22px;padding:10px 18px;font:15px Inter,-apple-system,Helvetica,sans-serif;z-index:50;display:none}
+#undo b{color:#ffb59e;margin-left:12px;cursor:pointer}
 </style></head><body>
 <div id="night"></div>
+<div id="undo"><span id="undot"></span><b id="undob">Undo</b></div>
 <div id="stage">
   <div class="top">
     <div><div class="clock" id="date"></div><div class="date" id="sub"></div></div>
@@ -142,9 +146,13 @@ function label(el){var c=el;while(c&&!/\bcard\b/.test(c.className||''))c=c.paren
   var t=(el.innerText||el.textContent).replace(/\b(Now|Next|CLASH|REPLY)\b/g,'').replace(/\s+/g,' ').trim();
   var n=new Date();return n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+' · '+sec+' · '+day+t}
 function send(text){try{var i=new Image();i.src=FORM+'?entry.113233410='+encodeURIComponent(text)+'&submit=Submit&t='+Date.now()}catch(e){}}
-function bindTicks(){var els=document.querySelectorAll('[data-k]');for(var i=0;i<els.length;i++){(function(el){var k=el.getAttribute('data-k');if(TICK[k]&&!/\bdone\b/.test(el.className))el.className+=' done';
-  if(TICK[k]&&typeof TICK[k]!=='object'){TICK[k]={t:TICK[k],s:1};send('DONE · '+label(el));saveT()}
-  el.onclick=function(){var l=label(el);if(TICK[k]){delete TICK[k];el.className=el.className.replace(/\s*done/g,'');send('UNDO · '+l)}else{TICK[k]={t:Date.now(),s:1};el.className+=' done';send('DONE · '+l)}saveT()}})(els[i])}}
+var undoT=null,undoFn=null;
+function showUndo(txt0,fn){$('undot').textContent='Ticked: '+txt0.slice(0,40);undoFn=fn;$('undo').style.display='block';clearTimeout(undoT);undoT=setTimeout(function(){$('undo').style.display='none';undoFn=null},6000)}
+function bindTicks(){var els=document.querySelectorAll('[data-k]');for(var i=0;i<els.length;i++){(function(el){var k=el.getAttribute('data-k');
+  if(TICK[k]){if(typeof TICK[k]!=='object'){TICK[k]={t:TICK[k],s:1};send('DONE · '+label(el));saveT()}el.className+=' gone'}
+  el.onclick=function(){var l=label(el);TICK[k]={t:Date.now(),s:1};saveT();send('DONE · '+l);el.className+=' done';
+    setTimeout(function(){if(TICK[k])el.className+=' gone'},700);
+    showUndo((el.innerText||'').replace(/\s+/g,' ').trim(),function(){delete TICK[k];saveT();send('UNDO · '+l);el.className=el.className.replace(/\s*(done|gone)/g,'')})}})(els[i])}}
 function render(){
   var now=new Date();
   if(!data){$('date').textContent='';return}
@@ -181,6 +189,7 @@ var NIGHT_FROM=19*60+30,NIGHT_TO=7*60+30,peekUntil=0;
 function nightCheck(){var n=new Date(),m=n.getHours()*60+n.getMinutes();var night=(m>=NIGHT_FROM||m<NIGHT_TO)&&Date.now()>peekUntil;$('night').style.display=night?'block':'none'}
 $('night').addEventListener('click',function(){peekUntil=Date.now()+60000;nightCheck()});
 setInterval(nightCheck,15000);nightCheck();
+$('undob').addEventListener('click',function(){if(undoFn)undoFn();$('undo').style.display='none';undoFn=null});
 fit();load();setInterval(render,30*1000);setInterval(load,10*60*1000);
 // Reload the whole page once a night so any design update arrives.
 setTimeout(function(){location.reload()},(function(){var n=new Date(),t=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1,4,0);return t-n})());
