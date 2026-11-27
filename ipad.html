@@ -143,7 +143,8 @@ function label(el){var c=el;while(c&&!/\bcard\b/.test(c.className||''))c=c.paren
   var n=new Date();return n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+' · '+sec+' · '+day+t}
 function send(text){try{var i=new Image();i.src=FORM+'?entry.113233410='+encodeURIComponent(text)+'&submit=Submit&t='+Date.now()}catch(e){}}
 function bindTicks(){var els=document.querySelectorAll('[data-k]');for(var i=0;i<els.length;i++){(function(el){var k=el.getAttribute('data-k');if(TICK[k]&&!/\bdone\b/.test(el.className))el.className+=' done';
-  el.onclick=function(){var l=label(el);if(TICK[k]){delete TICK[k];el.className=el.className.replace(/\s*done/g,'');send('UNDO · '+l)}else{TICK[k]=Date.now();el.className+=' done';send('DONE · '+l)}saveT()}})(els[i])}}
+  if(TICK[k]&&typeof TICK[k]!=='object'){TICK[k]={t:TICK[k],s:1};send('DONE · '+label(el));saveT()}
+  el.onclick=function(){var l=label(el);if(TICK[k]){delete TICK[k];el.className=el.className.replace(/\s*done/g,'');send('UNDO · '+l)}else{TICK[k]={t:Date.now(),s:1};el.className+=' done';send('DONE · '+l)}saveT()}})(els[i])}}
 function render(){
   var now=new Date();
   if(!data){$('date').textContent='';return}
