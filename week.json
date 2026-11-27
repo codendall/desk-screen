@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-27T11:50",
+ "updated": "2026-11-27T12:27",
  "days": [
   {
    "date": "2026-11-28",
@@ -140,13 +140,17 @@
      "k": "flag"
     },
     {
-     "t": "14:30",
+     "t": "12:00",
+     "w": "Teaching recovery"
+    },
+    {
+     "t": "14:15",
      "w": "Tutor meeting"
     },
     {
      "t": "14:40",
-     "w": "Appt (clashes with tutor)",
-     "k": "alert"
+     "w": "Appt",
+     "k": "home"
     },
     {
      "t": "15:15",
@@ -174,6 +178,11 @@
     {
      "t": "13:30",
      "w": "Meeting"
+    },
+    {
+     "t": "16:00",
+     "w": "Sleepover, to 19:45",
+     "k": "home"
     }
    ]
   }
