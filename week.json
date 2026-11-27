@@ -1,15 +1,10 @@
 {
- "updated": "2026-11-27T11:20",
+ "updated": "2026-11-27T11:25",
  "days": [
   {
    "date": "2026-11-28",
    "label": "Sat 28",
    "items": [
-    {
-     "t": "",
-     "w": "Scouts camp (all weekend)",
-     "k": "home"
-    },
     {
      "t": "09:30",
      "w": "Rugby match, meet 08:30",
@@ -32,18 +27,8 @@
    "label": "Sun 29",
    "items": [
     {
-     "t": "",
-     "w": "Scouts camp ends",
-     "k": "home"
-    },
-    {
      "t": "10:30",
      "w": "Cubs outing, to 16:00",
-     "k": "home"
-    },
-    {
-     "t": "18:00",
-     "w": "Advent carols",
      "k": "home"
     }
    ]
@@ -76,11 +61,6 @@
      "t": "16:30",
      "w": "Must leave",
      "k": "flag"
-    },
-    {
-     "t": "16:00",
-     "w": "Evening cover needed",
-     "k": "alert"
     }
    ]
   },
