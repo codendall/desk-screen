@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-27T11:25",
+ "updated": "2026-11-27T11:50",
  "days": [
   {
    "date": "2026-11-28",
@@ -27,8 +27,18 @@
    "label": "Sun 29",
    "items": [
     {
-     "t": "10:30",
-     "w": "Cubs outing, to 16:00",
+     "t": "",
+     "w": "Cubs outing",
+     "k": "home"
+    },
+    {
+     "t": "11:00",
+     "w": "Outing with friends, to 15:00",
+     "k": "home"
+    },
+    {
+     "t": "15:00",
+     "w": "Family outing, big wheel 16:00",
      "k": "home"
     }
    ]
