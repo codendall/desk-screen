@@ -71,12 +71,28 @@ ol li.done:before{content:'\2713';background:#3a9a5b}
 .gone{display:none!important}
 #undo{position:fixed;left:50%;bottom:26px;-webkit-transform:translateX(-50%);transform:translateX(-50%);background:#1f1d1a;color:#fff;border-radius:22px;padding:10px 18px;font:15px Inter,-apple-system,Helvetica,sans-serif;z-index:50;display:none}
 #undo b{color:#ffb59e;margin-left:12px;cursor:pointer}
+.pts{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;margin:0 18px}
+#bigred{width:84px;height:84px;border-radius:50%;border:0;background:radial-gradient(circle at 35% 30%,#ff7a6b,#e0261b 60%,#a3140d);box-shadow:0 6px 0 #7d0f09,0 10px 18px rgba(120,20,10,.35);color:#fff;font:700 13px Inter,-apple-system,Helvetica,sans-serif;letter-spacing:.5px;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-flex:none;flex:none}
+#bigred:active,#bigred.hit{-webkit-transform:translateY(5px);transform:translateY(5px);box-shadow:0 1px 0 #7d0f09,0 4px 8px rgba(120,20,10,.3)}
+.ptxt{margin-left:16px;width:190px}
+.ptxt .num{font-family:Fraunces,Georgia,serif;font-size:40px;font-weight:700;line-height:1;color:#1f1d1a}
+.ptxt .num small{font-family:Inter,sans-serif;font-size:13px;font-weight:600;color:#9a8f83;margin-left:4px}
+.bar{height:9px;border-radius:6px;background:#ece4d8;margin:7px 0 4px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#ffb020,#e0603f);border-radius:6px;-webkit-transition:width .5s;transition:width .5s}
+.goal{font-size:12px;color:#6d655c}
+.goal b{color:#e0603f;cursor:pointer}
+#pop{position:fixed;font:800 28px Fraunces,Georgia,serif;color:#e0603f;pointer-events:none;opacity:0;z-index:60}
+#pop.go{-webkit-animation:pop 1s ease-out;animation:pop 1s ease-out}
+@-webkit-keyframes pop{0%{opacity:1;-webkit-transform:translateY(0) scale(.8)}100%{opacity:0;-webkit-transform:translateY(-60px) scale(1.3)}}
+@keyframes pop{0%{opacity:1;transform:translateY(0) scale(.8)}100%{opacity:0;transform:translateY(-60px) scale(1.3)}}
 </style></head><body>
 <div id="night"></div>
+<div id="pop">+10</div>
 <div id="undo"><span id="undot"></span><b id="undob">Undo</b></div>
 <div id="stage">
   <div class="top">
     <div><div class="clock" id="date"></div><div class="date" id="sub"></div></div>
+    <div class="pts"><button id="bigred">BORING<br>THING<br>DONE</button><div class="ptxt"><div class="num" id="pnum">0<small>pts</small></div><div class="bar"><i id="pbar" style="width:0"></i></div><div class="goal" id="pgoal"></div></div></div>
     <div class="wx" id="wx"></div>
   </div>
   <div class="grid">
@@ -150,9 +166,9 @@ var undoT=null,undoFn=null;
 function showUndo(txt0,fn){$('undot').textContent='Ticked: '+txt0.slice(0,40);undoFn=fn;$('undo').style.display='block';clearTimeout(undoT);undoT=setTimeout(function(){$('undo').style.display='none';undoFn=null},6000)}
 function bindTicks(){var els=document.querySelectorAll('[data-k]');for(var i=0;i<els.length;i++){(function(el){var k=el.getAttribute('data-k');
   if(TICK[k]){if(typeof TICK[k]!=='object'){TICK[k]={t:TICK[k],s:1};send('DONE · '+label(el));saveT()}el.className+=' gone'}
-  el.onclick=function(){var l=label(el);TICK[k]={t:Date.now(),s:1};saveT();send('DONE · '+l);el.className+=' done';
+  el.onclick=function(ev){var l=label(el);TICK[k]={t:Date.now(),s:1};saveT();send('DONE · '+l);addPts(5,'ticked',(ev&&ev.clientX)||500,(ev&&ev.clientY)||300);el.className+=' done';
     setTimeout(function(){if(TICK[k])el.className+=' gone'},700);
-    showUndo((el.innerText||'').replace(/\s+/g,' ').trim(),function(){delete TICK[k];saveT();send('UNDO · '+l);el.className=el.className.replace(/\s*(done|gone)/g,'')})}})(els[i])}}
+    showUndo((el.innerText||'').replace(/\s+/g,' ').trim(),function(){delete TICK[k];saveT();send('UNDO · '+l);PTS=Math.max(0,PTS-5);savePts();drawPts();el.className=el.className.replace(/\s*(done|gone)/g,'')})}})(els[i])}}
 function render(){
   var now=new Date();
   if(!data){$('date').textContent='';return}
@@ -189,6 +205,16 @@ var NIGHT_FROM=19*60+30,NIGHT_TO=7*60+30,peekUntil=0;
 function nightCheck(){var n=new Date(),m=n.getHours()*60+n.getMinutes();var night=(m>=NIGHT_FROM||m<NIGHT_TO)&&Date.now()>peekUntil;$('night').style.display=night?'block':'none'}
 $('night').addEventListener('click',function(){peekUntil=Date.now()+60000;nightCheck()});
 setInterval(nightCheck,15000);nightCheck();
+// Points: big red button +10, each tick +5. Saved on the iPad and logged to the Desk ticks sheet.
+var GOAL=100,PTS=0;try{PTS=parseInt(localStorage.getItem('deskPts')||'0',10)||0}catch(e){}
+function savePts(){try{localStorage.setItem('deskPts',String(PTS))}catch(e){}}
+function drawPts(){$('pnum').innerHTML=PTS+'<small>pts</small>';var r=Math.min(100,Math.round(PTS%GOAL/GOAL*100));if(PTS>=GOAL)r=100;$('pbar').style.width=r+'%';
+  $('pgoal').innerHTML=PTS>=GOAL?'Treat unlocked! <b id="spend">Spend '+GOAL+'</b>':(GOAL-PTS)+' to your next treat';
+  var sp=document.getElementById('spend');if(sp)sp.onclick=function(){if(confirmSpend()){PTS-=GOAL;savePts();send('SPEND · -'+GOAL+' · treat');drawPts()}}}
+function confirmSpend(){var b=$('pgoal');if(b.getAttribute('data-c')){b.removeAttribute('data-c');return true}b.setAttribute('data-c','1');b.innerHTML='Tap again to spend <b id="spend">'+GOAL+' pts</b>';var sp=document.getElementById('spend');sp.onclick=function(){if(confirmSpend()){PTS-=GOAL;savePts();send('SPEND · -'+GOAL+' · treat');drawPts()}};setTimeout(function(){b.removeAttribute('data-c');drawPts()},4000);return false}
+function addPts(n,why,x,y){PTS+=n;savePts();send('POINTS · +'+n+' · '+why);drawPts();var p=$('pop');p.textContent='+'+n;p.style.left=(x-20)+'px';p.style.top=(y-30)+'px';p.className='';void p.offsetWidth;p.className='go'}
+$('bigred').addEventListener('click',function(e){var b=$('bigred');b.className='hit';setTimeout(function(){b.className=''},150);addPts(10,'boring thing done',e.clientX||500,e.clientY||100)});
+drawPts();
 $('undob').addEventListener('click',function(){if(undoFn)undoFn();$('undo').style.display='none';undoFn=null});
 fit();load();setInterval(render,30*1000);setInterval(load,10*60*1000);
 // Reload the whole page once a night so any design update arrives.
