@@ -54,6 +54,11 @@ ol li:before{content:attr(data-n);position:absolute;left:0;top:7px;width:28px;he
 .due .w{-webkit-flex:1;flex:1}
 .due .in{font-size:13px;color:#9a8f83;margin-left:8px;white-space:nowrap}
 .foot{position:absolute;left:30px;right:30px;bottom:12px;font-size:12px;color:#b0a597;display:-webkit-flex;display:flex;-webkit-justify-content:space-between;justify-content:space-between}
+.done{opacity:.35;text-decoration:line-through}
+ol li.done:before{content:'\2713';background:#3a9a5b}
+.chips span.done{background:#e6f4ea;color:#3a9a5b}
+.tap{-webkit-tap-highlight-color:rgba(224,96,63,.15);cursor:pointer}
+.hint{font-size:11px;color:#b0a597;letter-spacing:0;text-transform:none;font-weight:500}
 </style></head><body>
 <div id="stage">
   <div class="top">
@@ -66,7 +71,7 @@ ol li:before{content:attr(data-n);position:absolute;left:0;top:7px;width:28px;he
       <div class="card tom" id="tom" style="margin-bottom:0;max-height:196px"></div>
     </div>
     <div class="col r">
-      <div class="card"><h2><span>Do now</span></h2><ol id="donow"></ol></div>
+      <div class="card"><h2><span>Do now</span><span class="hint">tap to tick</span></h2><ol id="donow"></ol></div>
       <div class="card"><h2><span>Reply today</span><span class="n" id="rn">0</span></h2><div class="chips" id="reply"></div></div>
       <div class="card" style="margin-bottom:0;-webkit-flex:1;flex:1"><h2><span>Due soon</span></h2><ul class="due" id="due"></ul></div>
     </div>
@@ -108,6 +113,11 @@ function daysUntil(label){
   var t=new Date(now.getFullYear(),now.getMonth(),dn);if(t<new Date(now.getFullYear(),now.getMonth(),now.getDate()))t=new Date(now.getFullYear(),now.getMonth()+1,dn);
   return Math.round((t-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/864e5);
 }
+var TICK={};try{TICK=JSON.parse(localStorage.getItem('deskTicks')||'{}')}catch(e){TICK={}}
+function saveT(){try{localStorage.setItem('deskTicks',JSON.stringify(TICK))}catch(e){}}
+function key(k){return k.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}
+function bindTicks(){var els=document.querySelectorAll('[data-k]');for(var i=0;i<els.length;i++){(function(el){var k=el.getAttribute('data-k');if(TICK[k])el.className+=' done';
+  el.onclick=function(){if(TICK[k]){delete TICK[k];el.className=el.className.replace(/\s*done/g,'')}else{TICK[k]=Date.now();el.className+=' done'}saveT()}})(els[i])}}
 function render(){
   var now=new Date();$('clock').textContent=pad(now.getHours())+':'+pad(now.getMinutes());
   if(!data){$('date').textContent='';return}
@@ -124,12 +134,12 @@ function render(){
   $('today').innerHTML=h||'<div class="empty">Nothing else today</div>';$('nextin').textContent=nextIn;
   var tomh=(data.tom||'').replace(/<span style="[^"]*">/g,'<span class="hot">').split(/<br\s*\/?>/i).map(function(p){return '<p>'+p+'</p>'}).join('');
   $('tom').innerHTML='<h2><span>Coming up</span></h2>'+tomh;
-  h='';for(i=0;i<data.donow.length;i++)h+='<li data-n="'+(i+1)+'">'+esc(data.donow[i])+'</li>';$('donow').innerHTML=h;
-  $('rn').textContent=data.rn||data.reply.length;h='';for(i=0;i<data.reply.length;i++)if(data.reply[i])h+='<span>'+esc(data.reply[i])+'</span>';$('reply').innerHTML=h;
+  h='';for(i=0;i<data.donow.length;i++)h+='<li class="tap" data-k="'+esc(key(data.donow[i]))+'" data-n="'+(i+1)+'">'+esc(data.donow[i])+'</li>';$('donow').innerHTML=h;
+  $('rn').textContent=data.rn||data.reply.length;h='';for(i=0;i<data.reply.length;i++)if(data.reply[i])h+='<span class="tap" data-k="'+esc(key(data.reply[i]))+'">'+esc(data.reply[i])+'</span>';$('reply').innerHTML=h;
   h='';for(i=0;i<data.due.length;i++){var u=data.due[i];var dd=daysUntil(u.d);var inn=dd===null?'':dd===0?'today':dd===1?'tomorrow':'in '+dd+' days';
-    h+='<li class="'+(u.soon?'soon':'')+'"><span class="d">'+esc(u.d)+'</span><span class="w">'+esc(u.w)+'</span><span class="in">'+inn+'</span></li>'}
+    h+='<li class="tap '+(u.soon?'soon':'')+'" data-k="'+esc(key(u.w))+'"><span class="d">'+esc(u.d)+'</span><span class="w">'+esc(u.w)+'</span><span class="in">'+inn+'</span></li>'}
   $('due').innerHTML=h;
-  $('upd').textContent=data.upd?data.upd+' by the morning brief':'';
+  $('upd').textContent=data.upd?data.upd+' by the morning brief':'';bindTicks();
 }
 function load(){
   var x=new XMLHttpRequest();x.open('GET','index.html?t='+Date.now(),true);
