@@ -17,7 +17,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f6f1e9}
 .top{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;-webkit-justify-content:space-between;justify-content:space-between;margin-bottom:14px;height:100px}
 .clock{font-family:Fraunces,Georgia,serif;font-size:40px;line-height:1.05;font-weight:700;line-height:.9;letter-spacing:-2px}
 .date{font-size:20px;font-weight:600;color:#6d655c;margin-top:8px}
-.wx{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;background:#fff4d6;border:2px solid #f2c96b;border-radius:22px;padding:8px 20px 8px 12px;box-shadow:0 3px 12px rgba(120,80,20,.12);min-width:330px}
+.wx{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;background:#fff4d6;border:2px solid #f2c96b;border-radius:22px;padding:8px 20px 8px 12px;box-shadow:0 3px 12px rgba(120,80,20,.12);min-width:330px;max-width:470px}
 .wx svg{width:96px;height:68px;margin-right:14px;-webkit-flex:none;flex:none}
 .wx .lv{font-size:12.5px;font-weight:700;color:#5b4a2e;text-transform:uppercase;letter-spacing:1.2px}
 .wx .tp{font-family:Fraunces,Georgia,serif;font-size:40px;font-weight:700;color:#d2462a;line-height:1;margin:2px 0}
@@ -114,12 +114,12 @@ ol li.done:before{content:'\2713';background:#3a9a5b}
 .wx .rn{font-size:19px;font-weight:700;color:#2443b5;line-height:1.15;margin:3px 0 5px;max-width:230px}
 .wx .rn.wet{color:#d2462a}
 .wx .lv b{color:#d2462a}
-.wxr{width:100%}.rbars{display:-webkit-flex;display:flex;-webkit-align-items:flex-end;align-items:flex-end;height:34px;border-bottom:1px solid #e3cf9c}
-.rbars i{display:block;width:16px;margin-right:4px;background:#9db7f5;border-radius:3px 3px 0 0;min-height:3px;position:relative}
+.wxr{-webkit-flex:1;flex:1}.wx svg.live{width:84px;height:74px;margin-right:10px}.rbars{display:-webkit-flex;display:flex;-webkit-align-items:flex-end;align-items:flex-end;height:34px;border-bottom:1px solid #e3cf9c}
+.rbars i{display:block;width:13px;margin-right:3px;background:#9db7f5;border-radius:3px 3px 0 0;min-height:3px;position:relative}
 .rbars i.hi{background:#2f5bd8}.rbars i.past{opacity:.35}
 .wx .wd2{font-size:13px;font-weight:600;color:#5b4a2e;margin-top:3px}.wx .wd2.wet{color:#d2462a}
 .wx .rn{font-size:17px;margin:2px 0 4px}.rbars i.lvh{outline:2px solid #d2462a;outline-offset:1px}
-.rlab{display:-webkit-flex;display:flex;font-size:10px;color:#8a7a5c;font-weight:600;margin-top:2px}.rlab span{width:20px;-webkit-flex:none;flex:none;text-align:left}
+.rlab{display:-webkit-flex;display:flex;font-size:10px;color:#8a7a5c;font-weight:600;margin-top:2px}.rlab span{width:16px;-webkit-flex:none;flex:none;text-align:left}
 </style></head><body>
 <div id="night"></div>
 <div id="pop">+10</div>
@@ -326,8 +326,27 @@ syncSheet();setInterval(syncSheet,5*60*1000);
 // ---- Rain and wind for the day: Open-Meteo (Met Office model for the UK), checked every 15 min for the Strand ----
 var WX=null;
 function loadRain(){try{var x=new XMLHttpRequest();
-  x.open('GET','https://api.open-meteo.com/v1/forecast?latitude=51.5115&longitude=-0.1160&current=temperature_2m,precipitation&hourly=precipitation_probability,precipitation,temperature_2m,wind_speed_10m,wind_gusts_10m&minutely_15=precipitation&wind_speed_unit=mph&timezone=Europe%2FLondon&forecast_days=2',true);
+  x.open('GET','https://api.open-meteo.com/v1/forecast?latitude=51.5115&longitude=-0.1160&current=temperature_2m,precipitation,weather_code,is_day,wind_gusts_10m&hourly=precipitation_probability,precipitation,temperature_2m,wind_speed_10m,wind_gusts_10m&minutely_15=precipitation&wind_speed_unit=mph&timezone=Europe%2FLondon&forecast_days=2',true);
   x.onload=function(){if(x.status==200){try{WX=JSON.parse(x.responseText);WX.at=Date.now();render()}catch(e){}}};x.send()}catch(e){}}
+
+function wxIcon(){var c=WX.current||{},code=c.weather_code||0,day=c.is_day!==0,P=c.precipitation||0,g=c.wind_gusts_10m||0;
+  var kind=code<=1?(day?'sun':'moon'):code==2?(day?'part':'cloud'):code==3?'cloud':(code==45||code==48)?'fog':(code>=95)?'storm':((code>=71&&code<=77)||code==85||code==86)?'snow':(code>=51)?((code==65||code==67||code==82||code==63)?'heavy':'rain'):'cloud';
+  if(P>=0.1&&kind!='snow'&&kind!='storm'&&kind!='heavy')kind=P>=2?'heavy':'rain';
+  var K='#1f1d1a',face=function(cx,cy){return '<circle cx="'+(cx-7)+'" cy="'+cy+'" r="2.6" fill="'+K+'"/><circle cx="'+(cx+7)+'" cy="'+cy+'" r="2.6" fill="'+K+'"/><path d="M'+(cx-5)+' '+(cy+6)+'q5 5 10 0" stroke="'+K+'" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="'+(cx-13)+'" cy="'+(cy+5)+'" r="3" fill="#e0603f"/><circle cx="'+(cx+13)+'" cy="'+(cy+5)+'" r="3" fill="#e0603f"/>'};
+  var cloud=function(y){return '<path d="M22 '+(y+30)+'h50a14 14 0 0 0 0-28a20 20 0 0 0-38-6a15 15 0 0 0-12 34z" fill="#fff" stroke="'+K+'" stroke-width="3.2" stroke-linejoin="round"/>'};
+  var sun=function(x,y,r){var rays='';for(var a=0;a<8;a++){var t=a*Math.PI/4;rays+='<line x1="'+(x+Math.cos(t)*(r+4))+'" y1="'+(y+Math.sin(t)*(r+4))+'" x2="'+(x+Math.cos(t)*(r+10))+'" y2="'+(y+Math.sin(t)*(r+10))+'" stroke="'+K+'" stroke-width="2.6" stroke-linecap="round"/>'}return rays+'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="#ffd23f" stroke="'+K+'" stroke-width="3"/>'};
+  var drops=function(n){var d='',xs=[30,44,58,72];for(var i=0;i<n;i++)d+='<path d="M'+xs[i]+' 52q-4 6 0 9q4-3 0-9z" fill="#2f5bd8" stroke="'+K+'" stroke-width="1.6"/>';return d};
+  var g2='';if(g>=35)g2='<path d="M2 20q8-4 14 0M0 30q9-4 16 0" stroke="'+K+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
+  var b='';
+  if(kind=='sun')b=sun(48,34,17)+face(48,32);
+  else if(kind=='moon')b='<path d="M56 10a24 24 0 1 0 14 40a20 20 0 0 1-14-40z" fill="#ffd23f" stroke="'+K+'" stroke-width="3"/><path d="M80 14l2 4 4 1-4 2-2 4-2-4-4-2 4-1z" fill="#ffd23f"/>'+face(44,34);
+  else if(kind=='part')b=sun(66,18,12)+cloud(14)+face(48,30);
+  else if(kind=='cloud')b=cloud(10)+face(48,26);
+  else if(kind=='fog')b=cloud(6)+face(48,22)+'<path d="M20 50h56M26 57h46M22 64h52" stroke="#2f5bd8" stroke-width="3" stroke-linecap="round"/>';
+  else if(kind=='snow')b=cloud(4)+face(48,20)+'<text x="22" y="62" font-size="16" fill="#2f5bd8" font-weight="700">* * * *</text>';
+  else if(kind=='storm')b=cloud(4)+face(48,20)+drops(2)+'<path d="M50 44l-8 12h7l-5 11 12-15h-7l5-8z" fill="#ffd23f" stroke="'+K+'" stroke-width="1.8"/>';
+  else b=cloud(4)+face(48,20)+drops(kind=='heavy'?4:3);
+  return '<svg viewBox="0 -16 96 84" class="live">'+g2+b+'</svg>'}
 function hhmm(t){return t.slice(11,16)}
 function drawRain(){if(!WX||!WX.hourly||Date.now()-WX.at>3*3600000)return false;
   var H=WX.hourly,now=new Date(),day=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'T',nh=now.getHours(),i0=H.time.indexOf(day+pad(nh)+':00');if(i0<0)return false;
@@ -351,7 +370,7 @@ function drawRain(){if(!WX||!WX.hourly||Date.now()-WX.at>3*3600000)return false;
   var bars='',labs='',st=H.time.indexOf(day+'07:00');for(k=st;k>=0&&k<st+15;k++){var pp=H.precipitation_probability[k]||0,hr=+H.time[k].slice(11,13);
     bars+='<i class="'+(pp>=50?'hi':'')+(k==li?' lvh':'')+(k<i0?' past':'')+'" style="height:'+Math.max(3,Math.round(pp*0.34))+'px"></i>';
     labs+='<span>'+(hr%3==0?hr:'')+'</span>'}
-  $('wx').innerHTML='<div class="wxr"><div class="lv">'+lv+'</div><div class="rn'+(wet?' wet':'')+'">'+head+'</div><div class="rbars">'+bars+'</div><div class="rlab">'+labs+'</div><div class="wd2'+(windy?' wet':'')+'">'+wline+'</div></div>';
+  $('wx').innerHTML=wxIcon()+'<div class="wxr"><div class="lv">'+lv+'</div><div class="rn'+(wet?' wet':'')+'">'+head+'</div><div class="rbars">'+bars+'</div><div class="rlab">'+labs+'</div><div class="wd2'+(windy?' wet':'')+'">'+wline+'</div></div>';
   return true}
 loadRain();setInterval(loadRain,15*60*1000);
 </script>
