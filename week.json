@@ -1,53 +1,186 @@
 {
-  "updated": "2026-11-27T11:05",
-  "days": [
-    {"date": "2026-11-28", "label": "Sat 28", "items": [
-      {"t": "", "w": "Scouts camp (all weekend)", "k": "home"},
-      {"t": "09:30", "w": "Rugby", "k": "home"},
-      {"t": "09:45", "w": "Swimming", "k": "home"},
-      {"t": "11:00", "w": "Show day, to 17:00", "k": "home"},
-      {"t": "19:15", "w": "Dinner out", "k": "home"}
-    ]},
-    {"date": "2026-11-29", "label": "Sun 29", "items": [
-      {"t": "", "w": "Cubs outing", "k": "home"}
-    ]},
-    {"date": "2026-11-30", "label": "Mon 30", "items": [
-      {"t": "09:30", "w": "RUC"},
-      {"t": "11:00", "w": "Shared micro meeting"},
-      {"t": "12:30", "w": "Lister review"},
-      {"t": "14:00", "w": "Connor 1:1"},
-      {"t": "15:00", "w": "Zoha"},
-      {"t": "16:30", "w": "Must leave", "k": "flag"},
-      {"t": "16:00", "w": "Evening cover needed", "k": "alert"}
-    ]},
-    {"date": "2026-12-01", "label": "Tue 1", "items": [
-      {"t": "", "w": "PE kit", "k": "home"},
-      {"t": "10:00", "w": "Mock interview"},
-      {"t": "11:00", "w": "ZBP1 meeting"},
-      {"t": "15:15", "w": "Musical theatre", "k": "home"},
-      {"t": "15:30", "w": "Rugby training", "k": "home"}
-    ]},
-    {"date": "2026-12-02", "label": "Wed 2", "items": [
-      {"t": "", "w": "School forms due", "k": "due"},
-      {"t": "10:00", "w": "Lister review"},
-      {"t": "14:00", "w": "Lunch out", "k": "home"},
-      {"t": "15:30", "w": "Bug Christmas party"},
-      {"t": "17:00", "w": "Immunotalks seminar"},
-      {"t": "18:30", "w": "Christmas party, sitter to 21:30", "k": "home"}
-    ]},
-    {"date": "2026-12-03", "label": "Thu 3", "items": [
-      {"t": "09:00", "w": "Teaching prep"},
-      {"t": "11:00", "w": "Lecture 18", "k": "flag"},
-      {"t": "14:30", "w": "Tutor meeting"},
-      {"t": "14:40", "w": "Appt (clashes with tutor)", "k": "alert"},
-      {"t": "15:15", "w": "Arthika"}
-    ]},
-    {"date": "2026-12-04", "label": "Fri 4", "items": [
-      {"t": "", "w": "MRC project outcomes due", "k": "due"},
-      {"t": "09:30", "w": "Meeting"},
-      {"t": "10:15", "w": "Kim progress"},
-      {"t": "13:30", "w": "Meeting"},
-      {"t": "16:00", "w": "LAMDA", "k": "home"}
-    ]}
-  ]
+ "updated": "2026-11-27T11:20",
+ "days": [
+  {
+   "date": "2026-11-28",
+   "label": "Sat 28",
+   "items": [
+    {
+     "t": "",
+     "w": "Scouts camp (all weekend)",
+     "k": "home"
+    },
+    {
+     "t": "09:30",
+     "w": "Rugby match, meet 08:30",
+     "k": "home"
+    },
+    {
+     "t": "11:00",
+     "w": "Show day, to 17:00",
+     "k": "home"
+    },
+    {
+     "t": "19:15",
+     "w": "Dinner out",
+     "k": "home"
+    }
+   ]
+  },
+  {
+   "date": "2026-11-29",
+   "label": "Sun 29",
+   "items": [
+    {
+     "t": "",
+     "w": "Scouts camp ends",
+     "k": "home"
+    },
+    {
+     "t": "10:30",
+     "w": "Cubs outing, to 16:00",
+     "k": "home"
+    },
+    {
+     "t": "18:00",
+     "w": "Advent carols",
+     "k": "home"
+    }
+   ]
+  },
+  {
+   "date": "2026-11-30",
+   "label": "Mon 30",
+   "items": [
+    {
+     "t": "09:30",
+     "w": "RUC"
+    },
+    {
+     "t": "11:00",
+     "w": "Shared micro meeting"
+    },
+    {
+     "t": "12:30",
+     "w": "Lister review"
+    },
+    {
+     "t": "14:00",
+     "w": "Connor 1:1"
+    },
+    {
+     "t": "15:00",
+     "w": "Zoha"
+    },
+    {
+     "t": "16:30",
+     "w": "Must leave",
+     "k": "flag"
+    },
+    {
+     "t": "16:00",
+     "w": "Evening cover needed",
+     "k": "alert"
+    }
+   ]
+  },
+  {
+   "date": "2026-12-01",
+   "label": "Tue 1",
+   "items": [
+    {
+     "t": "10:00",
+     "w": "Mock interview"
+    },
+    {
+     "t": "11:00",
+     "w": "ZBP1 meeting"
+    }
+   ]
+  },
+  {
+   "date": "2026-12-02",
+   "label": "Wed 2",
+   "items": [
+    {
+     "t": "",
+     "w": "School forms due",
+     "k": "due"
+    },
+    {
+     "t": "10:00",
+     "w": "Lister review"
+    },
+    {
+     "t": "14:00",
+     "w": "Lunch out",
+     "k": "home"
+    },
+    {
+     "t": "15:30",
+     "w": "Bug Christmas party"
+    },
+    {
+     "t": "17:00",
+     "w": "Immunotalks seminar"
+    },
+    {
+     "t": "18:30",
+     "w": "Christmas party, sitter to 21:30",
+     "k": "home"
+    }
+   ]
+  },
+  {
+   "date": "2026-12-03",
+   "label": "Thu 3",
+   "items": [
+    {
+     "t": "09:00",
+     "w": "Teaching prep"
+    },
+    {
+     "t": "11:00",
+     "w": "Lecture 18",
+     "k": "flag"
+    },
+    {
+     "t": "14:30",
+     "w": "Tutor meeting"
+    },
+    {
+     "t": "14:40",
+     "w": "Appt (clashes with tutor)",
+     "k": "alert"
+    },
+    {
+     "t": "15:15",
+     "w": "Arthika"
+    }
+   ]
+  },
+  {
+   "date": "2026-12-04",
+   "label": "Fri 4",
+   "items": [
+    {
+     "t": "",
+     "w": "MRC project outcomes due",
+     "k": "due"
+    },
+    {
+     "t": "09:30",
+     "w": "Meeting"
+    },
+    {
+     "t": "10:15",
+     "w": "Kim progress"
+    },
+    {
+     "t": "13:30",
+     "w": "Meeting"
+    }
+   ]
+  }
+ ]
 }
